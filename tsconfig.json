@@ -10,7 +10,11 @@
     "moduleResolution": "node",
     "baseUrl": "./src",
     "declaration": true,
-    "declarationDir": "./"
+    "declarationDir": "./",
+    "lib": [
+      "dom",
+      "es6"
+    ]
   },
   "include": [
     "./src/**/*"
