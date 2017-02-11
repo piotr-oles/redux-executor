@@ -7,7 +7,7 @@ module.exports = function (config) {
     browsers: ['PhantomJS'],
     singleRun: true,
     colors: true,
-    frameworks: ['mocha', 'chai', 'karma-typescript'],
+    frameworks: ['mocha', 'chai', 'karma-typescript', 'es6-shim'],
     files: [
       'src/**/*.ts',
       'test/**/*.spec.ts'
@@ -17,6 +17,12 @@ module.exports = function (config) {
     },
     reporters: ['dots', 'karma-typescript'],
     karmaTypescriptConfig: {
+      compilerOptions: {
+        "lib": [
+          "dom",
+          "es6"
+        ]
+      },
       reports: {
         'lcovonly': {
           'directory': 'coverage',
