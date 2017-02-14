@@ -8,4 +8,5 @@ export { Executor } from './Executor';
 export { combineExecutors } from './combineExecutors';
 export { createExecutableStore } from './createExecutableStore';
 export { createExecutorEnhancer } from './createExecutorEnhancer';
+export { isCommand } from './isCommand';
 export { mountExecutor } from './mountExecutor';

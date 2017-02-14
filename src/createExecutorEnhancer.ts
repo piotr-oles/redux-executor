@@ -1,7 +1,7 @@
 import { StoreEnhancerStoreCreator, Store, Reducer, Action } from 'redux';
 import { Executor } from './Executor';
 import { ExecutableStore } from './ExecutableStore';
-import { isCommand } from './Command';
+import { isCommand } from './isCommand';
 
 export type StoreExecutableEnhancer<S> = (next: StoreEnhancerStoreCreator<S>) => StoreEnhancerStoreExecutableCreator<S>;
 export type StoreEnhancerStoreExecutableCreator<S> = (reducer: Reducer<S>, preloadedState: S) => ExecutableStore<S>;
@@ -12,7 +12,7 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
   }
 
   return function executorEnhancer(next: StoreEnhancerStoreCreator<S>): StoreEnhancerStoreExecutableCreator<S> {
-    return function detectableStoreCreator(reducer: Reducer<S>, preloadedState?: S): ExecutableStore<S> {
+    return function executableStoreCreator(reducer: Reducer<S>, preloadedState?: S): ExecutableStore<S> {
       // first create basic store
       const store: Store<S> = next(reducer, preloadedState);
 
