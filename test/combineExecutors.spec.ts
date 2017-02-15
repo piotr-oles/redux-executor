@@ -1,14 +1,14 @@
 
 import * as chai from 'chai';
 import * as spies from 'chai-spies';
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { combineExecutors } from '../src/index';
 
 chai.use(spies);
 
 describe('combineExecutors', () => {
   it('should export combineExecutors function', () => {
-    assert.isFunction(combineExecutors);
+    expect(combineExecutors).to.be.function;
   });
 
   it('should return valid executor for combination of two executors', () => {
@@ -25,15 +25,15 @@ describe('combineExecutors', () => {
 
     const executorAB = combineExecutors(executorA, executorB);
 
-    assert.isFunction(executorAB);
+    expect(executorAB).to.be.function;
     let promise = executorAB({}, { type: 'FOO', command: true }, () => {});
 
     let thenSpy = chai.spy();
     let catchSpy = chai.spy();
 
-    assert.isDefined(promise);
-    assert.isFunction((promise as Promise<void>).then);
-    assert.isFunction((promise as Promise<void>).catch);
+    expect(promise).to.exist;
+    expect((promise as Promise<void>).then).to.be.function;
+    expect((promise as Promise<void>).catch).to.be.function;
 
     (promise as Promise<void>).then(thenSpy).catch(catchSpy);
 
@@ -66,15 +66,15 @@ describe('combineExecutors', () => {
 
     const executorAB = combineExecutors(executorA, executorB);
 
-    assert.isFunction(executorAB);
+    expect(executorAB).to.be.function;
     let promise = executorAB({}, { type: 'FOO', command: true }, () => {});
 
     let thenSpy = chai.spy();
     let catchSpy = chai.spy();
 
-    assert.isDefined(promise);
-    assert.isFunction((promise as Promise<void>).then);
-    assert.isFunction((promise as Promise<void>).catch);
+    expect(promise).to.exist;
+    expect((promise as Promise<void>).then).to.be.function;
+    expect((promise as Promise<void>).catch).to.be.function;
 
     (promise as Promise<void>).then(thenSpy).catch(catchSpy);
 
@@ -89,7 +89,7 @@ describe('combineExecutors', () => {
   });
 
   it('should throw an exception for call with invalid argument', () => {
-    assert.throws(() => { (combineExecutors as any)({ 'foo': 'bar' }); }, Error);
-    assert.throws(() => { (combineExecutors as any)([function() {}, undefined]); }, Error);
+    expect(() => { (combineExecutors as any)({ 'foo': 'bar' }); }).to.throw(Error);
+    expect(() => { (combineExecutors as any)([function() {}, undefined]); }).to.throw(Error);
   });
 });

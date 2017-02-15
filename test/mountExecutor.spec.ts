@@ -1,7 +1,7 @@
 
 import * as chai from 'chai';
 import * as spies from 'chai-spies';
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { mountExecutor } from '../src/index';
 
 chai.use(spies);
@@ -9,7 +9,7 @@ chai.use(spies);
 describe('mountExecutor', () => {
 
   it('should export mountExecutor function', () => {
-    assert.isFunction(mountExecutor);
+    expect(mountExecutor).to.be.function;
   });
 
   it('should mount executor using selector', () => {
@@ -34,7 +34,7 @@ describe('mountExecutor', () => {
     const dumbDispatchSpy = chai.spy(dumbDispatch);
     const mountedExecutor = mountExecutor(selector, executor);
 
-    assert.isFunction(mountedExecutor);
+    expect(mountedExecutor).to.be.function;
 
     mountedExecutor(
       state,

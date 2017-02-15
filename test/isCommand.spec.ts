@@ -1,25 +1,25 @@
 
-import { assert } from 'chai';
+import { expect } from 'chai';
 import { isCommand } from '../src/index';
 
 describe('combineExecutors', () => {
   it('should export isCommand function', () => {
-    assert.isFunction(isCommand);
+    expect(isCommand).to.be.function;
   });
 
   it('should check if action is command', () => {
-    assert.isFalse(isCommand(undefined));
-    assert.isFalse(isCommand(null));
-    assert.isFalse(isCommand(NaN));
-    assert.isFalse(isCommand(false));
-    assert.isFalse(isCommand(true));
-    assert.isFalse(isCommand(() => {}));
-    assert.isFalse(isCommand(0));
-    assert.isFalse(isCommand({}));
-    assert.isFalse(isCommand({ type: 'SOME_TYPE' }));
-    assert.isFalse(isCommand({ type: 'SOME_TYPE', payload: { command: true } }));
-    assert.isFalse(isCommand({ type: 'SOME_TYPE', meta: { command: true } }));
+    expect(isCommand(undefined)).to.be.false;
+    expect(isCommand(null)).to.be.false;
+    expect(isCommand(NaN)).to.be.false;
+    expect(isCommand(false)).to.be.false;
+    expect(isCommand(true)).to.be.false;
+    expect(isCommand(() => {})).to.be.false;
+    expect(isCommand(0)).to.be.false;
+    expect(isCommand({})).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE' })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE', payload: { command: true } })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE', meta: { command: true } })).to.be.false;
 
-    assert.isTrue(isCommand({ type: 'SOME_TYPE', command: true }));
+    expect(isCommand({ type: 'SOME_TYPE', command: true })).to.be.true;
   });
 });

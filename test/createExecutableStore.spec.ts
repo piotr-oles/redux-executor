@@ -1,11 +1,11 @@
 
-import { assert } from 'chai';
+import { expect } from 'chai';
 import { createExecutableStore } from '../src/index';
 
 describe('createExecutableStore', () => {
 
   it('should export createExecutableStore function', () => {
-    assert.isFunction(createExecutableStore);
+    expect(createExecutableStore).to.be.function;
   });
 
   it('should create new redux store without enhancer', () => {
@@ -17,12 +17,12 @@ describe('createExecutableStore', () => {
     const dumbState = {};
     const detectableStore = createExecutableStore(dumbReducer, dumbExecutor, dumbState);
 
-    assert.isObject(detectableStore);
-    assert.isFunction(detectableStore.dispatch);
-    assert.isFunction(detectableStore.subscribe);
-    assert.isFunction(detectableStore.getState);
-    assert.isFunction(detectableStore.replaceReducer);
-    assert.isFunction(detectableStore.replaceExecutor);
+    expect(detectableStore).to.be.object;
+    expect(detectableStore.dispatch).to.be.function;
+    expect(detectableStore.subscribe).to.be.function;
+    expect(detectableStore.getState).to.be.function;
+    expect(detectableStore.replaceReducer).to.be.function;
+    expect(detectableStore.replaceExecutor).to.be.function;
   });
 
   it('should create new redux store with enhancer', () => {
@@ -35,11 +35,11 @@ describe('createExecutableStore', () => {
     const dumbEnhancer = function(next) { return next; };
     const detectableStore = createExecutableStore(dumbReducer, dumbExecutor, dumbState, dumbEnhancer);
 
-    assert.isObject(detectableStore);
-    assert.isFunction(detectableStore.dispatch);
-    assert.isFunction(detectableStore.subscribe);
-    assert.isFunction(detectableStore.getState);
-    assert.isFunction(detectableStore.replaceReducer);
-    assert.isFunction(detectableStore.replaceExecutor);
+    expect(detectableStore).to.be.object;
+    expect(detectableStore.dispatch).to.be.function;
+    expect(detectableStore.subscribe).to.be.function;
+    expect(detectableStore.getState).to.be.function;
+    expect(detectableStore.replaceReducer).to.be.function;
+    expect(detectableStore.replaceExecutor).to.be.function;
   });
 });
