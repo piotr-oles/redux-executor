@@ -44,6 +44,12 @@ const store = createStore(
 ## Motivation ##
 TODO
 
+## Composition ##
+TODO
+
+## Narrowing ##
+TODO
+
 ## Code Splitting ##
 Redux Executor provides `replaceExecutor` method on `ExecutableStore` interface (store created by Redux Executor). It's similar to
 `replaceReducer` - it changes executor and dispatches `{ type: '@@executor/INIT', command: true }`.
