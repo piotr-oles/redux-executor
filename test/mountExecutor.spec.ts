@@ -22,7 +22,7 @@ describe('mountExecutor', () => {
     };
     function dumbDispatch(action) {
     }
-    function executor(state, command, dispatch) {
+    function executor(command, dispatch, state) {
       if (state && state.value === 1 && command && command.type === 'COMMAND_THROUGH_MOUNT') {
         dispatch({type: 'SELECTORS_WORKED'});
       }
@@ -37,9 +37,9 @@ describe('mountExecutor', () => {
     expect(mountedExecutor).to.be.function;
 
     mountedExecutor(
-      state,
       { type: 'COMMAND_THROUGH_MOUNT', command: true },
-      dumbDispatchSpy
+      dumbDispatchSpy,
+      state
     );
 
     expect(dumbDispatchSpy).to.have.been.called.once.with({type: 'SELECTORS_WORKED'});

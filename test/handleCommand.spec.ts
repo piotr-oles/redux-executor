@@ -22,13 +22,13 @@ describe('combineExecutors', () => {
     expect(executorSpy).to.not.have.been.called;
 
     // expect that executor will bypass this command
-    targetedExecutor(dumbState, { type: 'ANOTHER_COMMAND_TYPE', command: true }, dispatchSpy);
+    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE', command: true }, dispatchSpy, dumbState);
     expect(executorSpy).to.not.have.been.called;
     expect(dispatchSpy).to.not.have.been.called;
 
     // expect that executor will call wrapped executor
-    targetedExecutor(dumbState, { type: 'COMMAND_TYPE', command: true }, dispatchSpy);
-    expect(executorSpy).to.have.been.called.with(dumbState, { type: 'COMMAND_TYPE', command: true }, dispatchSpy);
+    targetedExecutor({ type: 'COMMAND_TYPE', command: true }, dispatchSpy, dumbState);
+    expect(executorSpy).to.have.been.called.with({ type: 'COMMAND_TYPE', command: true }, dispatchSpy, dumbState);
     expect(dispatchSpy).to.have.been.called;
   });
 });

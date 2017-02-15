@@ -13,7 +13,7 @@ interface SequenceCommand extends Command {
 
 export const sequenceCommandExecutor: Executor<any> = handleCommand<any, SequenceCommand>(
   'SEQUENCE',
-  (state, command, dispatch) => command.payload.reduce(
+  (command, dispatch) => command.payload.reduce(
     (promise, command) => promise.then(() => dispatch(command).promise || Promise.resolve()),
     Promise.resolve()
   )

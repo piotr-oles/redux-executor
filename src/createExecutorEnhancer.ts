@@ -40,9 +40,9 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
         if (isCommand(action)) {
           // run executor instead of default dispatch
           let promise: Promise<void> | void = currentExecutor(
-            executableStore.getState(),
             action as any,
-            executableStore.dispatch
+            executableStore.dispatch,
+            executableStore.getState()
           );
 
           // return command with promise field to allow to synchronize dispatches

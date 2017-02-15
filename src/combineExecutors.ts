@@ -16,10 +16,10 @@ export function combineExecutors<S>(...executors: Executor<S>[]): Executor<S> {
     );
   }
 
-  return function combinedExecutor<C extends Command>(state: S, command: C, dispatch: ExecutableDispatch<S>): Promise<void> {
+  return function combinedExecutor<C extends Command>(command: C, dispatch: ExecutableDispatch<S>, state: S): Promise<void> {
     return Promise.all(
       executors
-        .map(executor => executor(state, command, dispatch))
+        .map(executor => executor(command, dispatch, state))
         .filter(promise => !!promise)
     ) as Promise<any>;
   };

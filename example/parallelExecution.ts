@@ -13,7 +13,7 @@ interface ParallelCommand extends Command {
 
 export const parallelCommandExecutor: Executor<any> = handleCommand<any, ParallelCommand>(
   'PARALLEL',
-  (state, command, dispatch) => Promise.all(
+  (command, dispatch) => Promise.all(
     command.payload.map(command => dispatch(command).promise || Promise.resolve())
   ).then(() => undefined)
 );
