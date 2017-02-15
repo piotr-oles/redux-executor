@@ -1080,9 +1080,17 @@ error-ex@^1.2.0:
   dependencies:
     is-arrayish "^0.2.1"
 
+es5-shim@~4.5.8:
+  version "4.5.9"
+  resolved "https://registry.yarnpkg.com/es5-shim/-/es5-shim-4.5.9.tgz#2a1e2b9e583ff5fed0c20a3ee2cbf3f75230a5c0"
+
 es6-promise@^4.0.5, es6-promise@~4.0.3:
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.0.5.tgz#7882f30adde5b240ccfa7f7d78c548330951ae42"
+
+es6-shim@~0.35.0:
+  version "0.35.3"
+  resolved "https://registry.yarnpkg.com/es6-shim/-/es6-shim-0.35.3.tgz#9bfb7363feffff87a6cdb6cd93e405ec3c4b6f26"
 
 escape-html@~1.0.3:
   version "1.0.3"
@@ -1106,10 +1114,6 @@ escodegen@1.8.x:
 esprima@2.7.x, esprima@^2.6.0, esprima@^2.7.1:
   version "2.7.3"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-2.7.3.tgz#96e3b70d5779f6ad49cd032673d1c312767ba581"
-
-esprima@^3.1.1:
-  version "3.1.3"
-  resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.3.tgz#fdca51cee6133895e3c88d535ce49dbff62a4633"
 
 estraverse@^1.9.1:
   version "1.9.3"
@@ -1806,19 +1810,12 @@ js-tokens@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.1.tgz#08e9f132484a2c45a30907e9dc4d5567b7f114d7"
 
-js-yaml@3.6.1:
+js-yaml@3.6.1, js-yaml@3.x:
   version "3.6.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.6.1.tgz#6e5fe67d8b205ce4d22fad05b7781e8dadcc4b30"
   dependencies:
     argparse "^1.0.7"
     esprima "^2.6.0"
-
-js-yaml@3.x:
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.8.1.tgz#782ba50200be7b9e5a8537001b7804db3ad02628"
-  dependencies:
-    argparse "^1.0.7"
-    esprima "^3.1.1"
 
 jsbn@~0.1.0:
   version "0.1.0"
@@ -1901,6 +1898,13 @@ karma-coverage@^1.1.1:
     lodash "^3.8.0"
     minimatch "^3.0.0"
     source-map "^0.5.1"
+
+karma-es6-shim@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/karma-es6-shim/-/karma-es6-shim-1.0.0.tgz#aaeb530862bcf79340ebd588f4f9e57de842b479"
+  dependencies:
+    es5-shim "~4.5.8"
+    es6-shim "~0.35.0"
 
 karma-mocha@^1.3.0:
   version "1.3.0"
@@ -2508,7 +2512,7 @@ oauth-sign@~0.8.1:
   version "0.8.2"
   resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.8.2.tgz#46a6ab7f0aead8deae9ec0565780b7d4efeb9d43"
 
-object-assign@4.1.0:
+object-assign@4.1.0, object-assign@^4.0.1, object-assign@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.0.tgz#7a3b3d0e98063d43f4c03f2e8ae6cd51a86883a0"
 
@@ -2516,7 +2520,7 @@ object-assign@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-3.0.0.tgz#9bedd5ca0897949bca47e7ff408062d549f587f2"
 
-object-assign@^4.0.1, object-assign@^4.1.0:
+object-assign@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/object-assign/-/object-assign-4.1.1.tgz#2109adc7965887cfc05cbbd442cac8bfbb360863"
 
@@ -3066,7 +3070,7 @@ semver-diff@^2.0.0:
   dependencies:
     semver "^5.0.3"
 
-"semver@2 || 3 || 4 || 5", semver@^5.0.1, semver@^5.0.3, semver@^5.1.0, semver@~5.3.0:
+"semver@2 || 3 || 4 || 5", semver@^5.0.1, semver@^5.0.3, semver@^5.1.0, semver@^5.3.0, semver@~5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
 
@@ -3431,14 +3435,15 @@ ts-loader@^2.0.0:
     loader-utils "^0.2.6"
     semver "^5.0.1"
 
-tslint-loader@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/tslint-loader/-/tslint-loader-3.3.0.tgz#6e6a50fc82e85ff3d1cb53e23dd24ae9e47d91ea"
+tslint-loader@^3.4.2:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/tslint-loader/-/tslint-loader-3.4.2.tgz#f26424b4dbfe1718acb96469e807038b1d2a644a"
   dependencies:
     loader-utils "^0.2.7"
     mkdirp "^0.5.1"
-    object-assign "^4.0.1"
+    object-assign "^4.1.1"
     rimraf "^2.4.4"
+    semver "^5.3.0"
 
 tslint@^4.4.2:
   version "4.4.2"
@@ -3490,9 +3495,9 @@ typedarray@~0.0.5:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.5.tgz#6fe9479e00e01855247cea216e7561bafcdbcd4a"
+typescript@^2.1.6:
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-2.1.6.tgz#40c7e6e9e5da7961b7718b55505f9cac9487a607"
 
 uglify-js@^2.6, uglify-js@^2.7.5:
   version "2.7.5"
