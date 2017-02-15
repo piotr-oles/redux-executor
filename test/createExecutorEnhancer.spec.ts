@@ -1,7 +1,7 @@
 import * as chai from 'chai';
 import * as spies from 'chai-spies';
 import { expect } from 'chai';
-import { createExecutorEnhancer } from '../src/index';
+import { createExecutorEnhancer, EXECUTOR_INIT } from '../src/index';
 
 chai.use(spies);
 
@@ -9,6 +9,10 @@ describe('createExecutorEnhancer', () => {
 
   it('should export createExecutorEnhancer function', () => {
     expect(createExecutorEnhancer).to.be.function;
+  });
+
+  it('should export EXECUTOR_INIT string', () => {
+    expect(EXECUTOR_INIT).to.be.string;
   });
 
   it('should throw an exception if executor is not a function', () => {
@@ -91,6 +95,7 @@ describe('createExecutorEnhancer', () => {
 
     executableStore.replaceExecutor(nextExecutorSpy);
     expect(dispatchSpy).to.not.have.been.called;
+    expect(nextExecutorSpy).to.have.been.called.with({}, { type: EXECUTOR_INIT, command: true }, executableStore.dispatch);
 
     const nextCommandResult = executableStore.dispatch({ type: 'NEXT_DETECTOR_COMMAND', command: true });
     expect(dispatchSpy).to.not.have.been.called;
@@ -98,7 +103,7 @@ describe('createExecutorEnhancer', () => {
     expect(nextCommandResult.promise).to.exist;
     expect(nextCommandResult.promise.then).to.be.function;
 
-    expect(nextExecutorSpy).to.have.been.called.once.with({}, { type: 'NEXT_DETECTOR_COMMAND', command: true }, executableStore.dispatch);
+    expect(nextExecutorSpy).to.have.been.called.with({}, { type: 'NEXT_DETECTOR_COMMAND', command: true }, executableStore.dispatch);
     expect(dispatchSpy).to.not.have.been.called;
 
     executableStore.dispatch({ type: 'NON_COMMAND' });

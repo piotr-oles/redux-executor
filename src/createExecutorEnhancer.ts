@@ -3,6 +3,8 @@ import { Executor } from './Executor';
 import { ExecutableStore } from './ExecutableStore';
 import { isCommand } from './isCommand';
 
+export const EXECUTOR_INIT: '@@executor/INIT' = '@@executor/INIT';
+
 export type StoreExecutableEnhancer<S> = (next: StoreEnhancerStoreCreator<S>) => StoreEnhancerStoreExecutableCreator<S>;
 export type StoreEnhancerStoreExecutableCreator<S> = (reducer: Reducer<S>, preloadedState: S) => ExecutableStore<S>;
 
@@ -29,6 +31,7 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
           }
 
           currentExecutor = nextExecutor;
+          executableStore.dispatch({ type: EXECUTOR_INIT, command: true });
         }
       };
 

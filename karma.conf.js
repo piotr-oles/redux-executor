@@ -24,6 +24,9 @@ module.exports = function (config) {
           "es6"
         ]
       },
+      exclude: [
+        "example/*.ts"
+      ],
       reports: {
         'lcovonly': {
           'directory': 'coverage',
