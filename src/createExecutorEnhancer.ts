@@ -13,14 +13,14 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
 
   return function executorEnhancer(next: StoreEnhancerStoreCreator<S>): StoreEnhancerStoreExecutableCreator<S> {
     return function executableStoreCreator(reducer: Reducer<S>, preloadedState?: S): ExecutableStore<S> {
-      // first create basic store
+      // create basic store
       const store: Store<S> = next(reducer, preloadedState);
 
-      // then set initial values in this scope
+      // set initial values in this scope
       let prevState: S | undefined = preloadedState;
       let currentExecutor: Executor<S> = executor;
 
-      // store executable adds `replaceExecutor` method to it's interface
+      // executable store adds `replaceExecutor` method to it's interface
       const executableStore: ExecutableStore<S> = {
         ...store as any, // some bug in typescript object spread operator?
         replaceExecutor: function replaceExecutor(nextExecutor: Executor<S>): void {
@@ -36,12 +36,17 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
       executableStore.dispatch = <A extends Action>(action: A): A & { promise?: Promise<void> } => {
         if (isCommand(action)) {
           // run executor instead of default dispatch
-          let promise: Promise<void> | void = currentExecutor(executableStore.getState(), action as any, executableStore.dispatch);
+          let promise: Promise<void> | void = currentExecutor(
+            executableStore.getState(),
+            action as any,
+            executableStore.dispatch
+          );
 
-          // return also promise to allow to synchronize dispatches
+          // return command with promise field to allow to synchronize dispatches
           return Object.assign({}, action as any, { promise: promise || Promise.resolve() });
         }
 
+        // call original dispatch
         return store.dispatch(action);
       };
 

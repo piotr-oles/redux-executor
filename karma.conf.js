@@ -13,7 +13,8 @@ module.exports = function (config) {
       'test/**/*.spec.ts'
     ],
     preprocessors: {
-      '**/*.ts': ['karma-typescript']
+      'src/**/*.ts': ['karma-typescript'],
+      'test/**/*.spec.ts': ['karma-typescript']
     },
     reporters: ['dots', 'karma-typescript'],
     karmaTypescriptConfig: {
