@@ -26,7 +26,7 @@ describe('combineExecutors', () => {
     const executorAB = combineExecutors(executorA, executorB);
 
     expect(executorAB).to.be.function;
-    let promise = executorAB({ type: 'FOO', command: true }, () => {}, {});
+    let promise = executorAB({ type: 'FOO()' }, () => {}, {});
 
     let thenSpy = chai.spy();
     let catchSpy = chai.spy();
@@ -67,7 +67,7 @@ describe('combineExecutors', () => {
     const executorAB = combineExecutors(executorA, executorB);
 
     expect(executorAB).to.be.function;
-    let promise = executorAB({ type: 'FOO', command: true }, () => {}, {});
+    let promise = executorAB({ type: 'FOO()' }, () => {}, {});
 
     let thenSpy = chai.spy();
     let catchSpy = chai.spy();

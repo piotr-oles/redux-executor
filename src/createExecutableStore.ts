@@ -3,6 +3,15 @@ import { Executor } from './Executor';
 import { ExecutableStore } from './ExecutableStore';
 import { createExecutorEnhancer } from './createExecutorEnhancer';
 
+/**
+ * Create store that will be able to handle executors and commands.
+ *
+ * @param reducer Main redux reducer
+ * @param executor Main redux executor
+ * @param preloadedState State that should be initialized
+ * @param enhancer Additional enhancer
+ * @returns Executable Store that will handle commands and executors
+ */
 export function createExecutableStore<S>(
   reducer: Reducer<S>,
   executor: Executor<S>,

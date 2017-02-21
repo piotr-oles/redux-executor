@@ -1,5 +1,4 @@
 // typings
-export { Command } from './Command';
 export { ExecutableDispatch } from './ExecutableDispatch';
 export { ExecutableStore } from './ExecutableStore';
 export { Executor, NarrowExecutor } from './Executor';

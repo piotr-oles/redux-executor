@@ -1,5 +1,13 @@
-import { Command } from "./Command";
-import { ExecutableDispatch } from "./ExecutableDispatch";
+import { Action } from 'redux';
+import { ExecutableDispatch } from './ExecutableDispatch';
 
-export type Executor<S> = <C extends Command>(command: C, dispatch: ExecutableDispatch<S>, state: S) => Promise<void> | void;
-export type NarrowExecutor<S, C extends Command> = (command: C, dispatch: ExecutableDispatch<S>, state: S) => Promise<void> | void;
+/**
+ * Executor is an simple function that executes some side effects on given command.
+ * They can return promise if side effect is asynchronous.
+ */
+export type Executor<S> = <A extends Action>(command: A, dispatch: ExecutableDispatch<S>, state: S) => Promise<void> | void;
+
+/**
+ * It's executor limited to given action (command) type.
+ */
+export type NarrowExecutor<S, A extends Action> = (command: A, dispatch: ExecutableDispatch<S>, state: S) => Promise<void> | void;
