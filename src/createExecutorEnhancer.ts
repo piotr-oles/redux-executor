@@ -3,11 +3,17 @@ import { Executor } from './Executor';
 import { ExecutableStore } from './ExecutableStore';
 import { isCommand } from './isCommand';
 
-export const EXECUTOR_INIT: '@@executor/INIT' = '@@executor/INIT';
+export const EXECUTOR_INIT: string = '@@executor/INIT()';
 
 export type StoreExecutableEnhancer<S> = (next: StoreEnhancerStoreCreator<S>) => StoreEnhancerStoreExecutableCreator<S>;
 export type StoreEnhancerStoreExecutableCreator<S> = (reducer: Reducer<S>, preloadedState: S) => ExecutableStore<S>;
 
+/**
+ * Create enhacer for redux store. This enhancer adds commands and executors support.
+ *
+ * @param executor Main redux executor
+ * @returns Store enhancer
+ */
 export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutableEnhancer<S> {
   if (typeof executor !== 'function') {
     throw new Error('Expected the executor to be a function.');
@@ -31,7 +37,7 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
           }
 
           currentExecutor = nextExecutor;
-          executableStore.dispatch({ type: EXECUTOR_INIT, command: true });
+          executableStore.dispatch({ type: EXECUTOR_INIT });
         }
       };
 

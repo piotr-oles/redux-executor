@@ -23,7 +23,7 @@ describe('mountExecutor', () => {
     function dumbDispatch(action) {
     }
     function executor(command, dispatch, state) {
-      if (state && state.value === 1 && command && command.type === 'COMMAND_THROUGH_MOUNT') {
+      if (state && state.value === 1 && command && command.type === 'COMMAND_THROUGH_MOUNT()') {
         dispatch({type: 'SELECTORS_WORKED'});
       }
     }
@@ -37,11 +37,18 @@ describe('mountExecutor', () => {
     expect(mountedExecutor).to.be.function;
 
     mountedExecutor(
-      { type: 'COMMAND_THROUGH_MOUNT', command: true },
+      { type: 'COMMAND_THROUGH_MOUNT()' },
       dumbDispatchSpy,
       state
     );
 
     expect(dumbDispatchSpy).to.have.been.called.once.with({type: 'SELECTORS_WORKED'});
+  });
+
+  it('should throw an exception for call with invalid argument', () => {
+    expect(() => { (mountExecutor as any)(() => {}, undefined); }).to.throw(Error);
+    expect(() => { (mountExecutor as any)(undefined, () => {}); }).to.throw(Error);
+    expect(() => { (mountExecutor as any)({}, () => {}); }).to.throw(Error);
+    expect(() => { (mountExecutor as any)('test', 'test'); }).to.throw(Error);
   });
 });
