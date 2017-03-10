@@ -87,7 +87,7 @@ describe('createExecutorEnhancer', () => {
 
     expect(dispatchSpy).to.not.have.been.called;
 
-    const commandResult = executableStore.dispatch({ type: 'DETECTOR_COMMAND', command: true });
+    const commandResult = executableStore.dispatch({ type: 'DETECTOR_COMMAND()' });
     expect(dispatchSpy).to.not.have.been.called;
     expect(commandResult).to.exist;
     expect(commandResult.promise).to.exist;
@@ -95,15 +95,15 @@ describe('createExecutorEnhancer', () => {
 
     executableStore.replaceExecutor(nextExecutorSpy);
     expect(dispatchSpy).to.not.have.been.called;
-    expect(nextExecutorSpy).to.have.been.called.with({ type: EXECUTOR_INIT, command: true }, executableStore.dispatch, {});
+    expect(nextExecutorSpy).to.have.been.called.with({ type: EXECUTOR_INIT }, executableStore.dispatch, {});
 
-    const nextCommandResult = executableStore.dispatch({ type: 'NEXT_DETECTOR_COMMAND', command: true });
+    const nextCommandResult = executableStore.dispatch({ type: 'NEXT_DETECTOR_COMMAND()' });
     expect(dispatchSpy).to.not.have.been.called;
     expect(nextCommandResult).to.exist;
     expect(nextCommandResult.promise).to.exist;
     expect(nextCommandResult.promise.then).to.be.function;
 
-    expect(nextExecutorSpy).to.have.been.called.with({ type: 'NEXT_DETECTOR_COMMAND', command: true }, executableStore.dispatch, {});
+    expect(nextExecutorSpy).to.have.been.called.with({ type: 'NEXT_DETECTOR_COMMAND()' }, executableStore.dispatch, {});
     expect(dispatchSpy).to.not.have.been.called;
 
     executableStore.dispatch({ type: 'NON_COMMAND' });

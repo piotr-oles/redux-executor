@@ -17,9 +17,11 @@ describe('combineExecutors', () => {
     expect(isCommand(0)).to.be.false;
     expect(isCommand({})).to.be.false;
     expect(isCommand({ type: 'SOME_TYPE' })).to.be.false;
-    expect(isCommand({ type: 'SOME_TYPE', payload: { command: true } })).to.be.false;
-    expect(isCommand({ type: 'SOME_TYPE', meta: { command: true } })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE( )' })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE)' })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE(' })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYP(E)' })).to.be.false;
 
-    expect(isCommand({ type: 'SOME_TYPE', command: true })).to.be.true;
+    expect(isCommand({ type: 'SOME_TYPE()' })).to.be.true;
   });
 });

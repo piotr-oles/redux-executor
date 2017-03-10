@@ -1,7 +1,13 @@
-import { Command } from './Command';
+import { Action } from 'redux';
 import { Executor } from './Executor';
 import { ExecutableDispatch } from './ExecutableDispatch';
 
+/**
+ * Combine executors to get one that will call wrapped.
+ *
+ * @param executors Executors to combine
+ * @returns Executor that wraps all given executors
+ */
 export function combineExecutors<S>(...executors: Executor<S>[]): Executor<S> {
   // check executors type in runtime
   const invalidExecutorsIndexes: number[] = executors
@@ -16,7 +22,7 @@ export function combineExecutors<S>(...executors: Executor<S>[]): Executor<S> {
     );
   }
 
-  return function combinedExecutor<C extends Command>(command: C, dispatch: ExecutableDispatch<S>, state: S): Promise<void> {
+  return function combinedExecutor<A extends Action>(command: A, dispatch: ExecutableDispatch<S>, state: S): Promise<void> {
     return Promise.all(
       executors
         .map(executor => executor(command, dispatch, state))

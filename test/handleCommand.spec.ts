@@ -16,19 +16,31 @@ describe('combineExecutors', () => {
     const dispatchSpy = chai.spy();
     const dumbState = {};
 
-    const targetedExecutor = handleCommand('COMMAND_TYPE', executorSpy);
+    const targetedExecutor = handleCommand('COMMAND_TYPE()', executorSpy);
 
     expect(targetedExecutor).to.be.function;
     expect(executorSpy).to.not.have.been.called;
 
     // expect that executor will bypass this command
-    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE', command: true }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE()' }, dispatchSpy, dumbState);
+    expect(executorSpy).to.not.have.been.called;
+    expect(dispatchSpy).to.not.have.been.called;
+
+    // expect that executor will bypass similar non command
+    targetedExecutor({ type: 'COMMAND_TYPE' }, dispatchSpy, dumbState);
     expect(executorSpy).to.not.have.been.called;
     expect(dispatchSpy).to.not.have.been.called;
 
     // expect that executor will call wrapped executor
-    targetedExecutor({ type: 'COMMAND_TYPE', command: true }, dispatchSpy, dumbState);
-    expect(executorSpy).to.have.been.called.with({ type: 'COMMAND_TYPE', command: true }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'COMMAND_TYPE()' }, dispatchSpy, dumbState);
+    expect(executorSpy).to.have.been.called.with({ type: 'COMMAND_TYPE()' }, dispatchSpy, dumbState);
     expect(dispatchSpy).to.have.been.called;
+  });
+
+  it('should throw an exception for call with invalid argument', () => {
+    expect(() => { (handleCommand as any)('TEST()', undefined); }).to.throw(Error);
+    expect(() => { (handleCommand as any)('TEST()', 123); }).to.throw(Error);
+    expect(() => { (handleCommand as any)('TEST', () => {}); }).to.throw(Error);
+    expect(() => { (handleCommand as any)('TEST', undefined); }).to.throw(Error);
   });
 });
