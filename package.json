@@ -1,6 +1,6 @@
 {
   "name": "redux-executor",
-  "version": "0.5.2",
+  "version": "0.5.1-alpha",
   "description": "Redux enhancer for handling side effects.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
