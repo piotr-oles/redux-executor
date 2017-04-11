@@ -1,6 +1,6 @@
 
-import { Action } from 'redux';
-import { Executor, NarrowExecutor } from './Executor';
+import { ActionLike } from './ActionLike';
+import { Executor } from './Executor';
 import { ExecutableDispatch } from './ExecutableDispatch';
 
 /**
@@ -10,7 +10,7 @@ import { ExecutableDispatch } from './ExecutableDispatch';
  * @param executor Wrapped executor
  * @returns Executor that runs wrapped executor only for commands with given type.
  */
-export function handleCommand<S, A extends Action>(type: string, executor: NarrowExecutor<S, A>): Executor<S> {
+export function handleCommand<S>(type: string, executor: Executor<S>): Executor<S> {
   if (!type || type.length < 3 || ')' !== type[type.length - 1] || '(' !== type[type.length - 2]) {
     throw new Error(`Expected type to be valid command type with '()' ending. Given '${type}' type. Maybe typo?`);
   }
@@ -19,9 +19,9 @@ export function handleCommand<S, A extends Action>(type: string, executor: Narro
     throw new Error('Expected the executor to be a function.');
   }
 
-  return function wideExecutor(command: Action, dispatch: ExecutableDispatch<S>, state: S): Promise<void> | void {
+  return function wideExecutor(command: ActionLike, dispatch: ExecutableDispatch<S>, state: S): Promise<void> | void {
     if (command && command.type === type) {
-      return executor(command as A, dispatch, state);
+      return executor(command, dispatch, state);
     }
   };
 }

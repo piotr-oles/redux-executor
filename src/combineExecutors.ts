@@ -1,32 +1,25 @@
-import { Action } from 'redux';
 import { Executor } from './Executor';
+import { ActionLike } from './ActionLike';
 import { ExecutableDispatch } from './ExecutableDispatch';
 
+export type ExecutorsMap<S> = {
+  [K in keyof S]?: Executor<S[K]>;
+};
+
 /**
- * Combine executors to get one that will call wrapped.
+ * Combine executors to bind them to the local state.
+ * It allows to create reusable executors.
  *
- * @param executors Executors to combine
- * @returns Executor that wraps all given executors
+ * @param map Map of executors bounded to state.
+ * @returns Combined executor
  */
-export function combineExecutors<S>(...executors: Executor<S>[]): Executor<S> {
-  // check executors type in runtime
-  const invalidExecutorsIndexes: number[] = executors
-    .map((executor, index) => executor instanceof Function ? -1 : index)
-    .filter(index => index !== -1);
-
-  if (invalidExecutorsIndexes.length) {
-    throw new Error(
-      `Invalid arguments: ${invalidExecutorsIndexes.join(', ')} in combineExecutors call.\n` +
-      `Executors should be a 'function' type, ` +
-      `'${invalidExecutorsIndexes.map(index => typeof executors[index]).join(`', '`)}' types passed.`
-    );
-  }
-
-  return function combinedExecutor<A extends Action>(command: A, dispatch: ExecutableDispatch<S>, state: S): Promise<void> {
+export function combineExecutors<S>(map: ExecutorsMap<S>): Executor<S> {
+  return function combinedExecutor(command: ActionLike, dispatch: ExecutableDispatch<S>, state: S | undefined): Promise<void> {
     return Promise.all(
-      executors
-        .map(executor => executor(command, dispatch, state))
-        .filter(promise => !!promise)
-    ) as Promise<any>;
+      Object.keys(map).map((key: keyof S) => map[key]!(command, dispatch, state ? state[key] : undefined) || Promise.resolve())
+    ).then(
+      /* istanbul ignore next */
+      () => undefined
+    );
   };
 }

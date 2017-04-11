@@ -6,7 +6,7 @@ import { handleCommand } from '../src/index';
 
 chai.use(spies);
 
-describe('combineExecutors', () => {
+describe('handleCommand', () => {
   it('should export handleCommand function', () => {
     expect(handleCommand).to.be.function;
   });

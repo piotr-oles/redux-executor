@@ -1,10 +1,12 @@
 
 import * as chai from 'chai';
 import * as spies from 'chai-spies';
+import * as promised from 'chai-as-promised';
 import { expect } from 'chai';
 import { combineExecutors } from '../src/index';
 
 chai.use(spies);
+chai.use(promised);
 
 describe('combineExecutors', () => {
   it('should export combineExecutors function', () => {
@@ -12,84 +14,100 @@ describe('combineExecutors', () => {
   });
 
   it('should return valid executor for combination of two executors', () => {
-    let promiseAResolve, promiseAReject;
-    let promiseBResolve, promiseBReject;
-
-    function executorA() {
-      return new Promise<void>((resolve, reject) => { promiseAResolve = resolve; promiseAReject = reject; });
+    function executorResolved() {
+      return Promise.resolve();
     }
 
-    function executorB() {
-      return new Promise<void>((resolve, reject) => { promiseBResolve = resolve; promiseBReject = reject; });
+    function executorRejected() {
+      return Promise.reject(new Error());
     }
 
-    const executorAB = combineExecutors(executorA, executorB);
+    function executorVoid() {
+    }
 
-    expect(executorAB).to.be.function;
-    let promise = executorAB({ type: 'FOO()' }, () => {}, {});
+    const executorABC = combineExecutors({
+      a: executorResolved,
+      b: executorResolved,
+      c: executorVoid
+    });
+
+    expect(executorABC).to.be.function;
+    let promiseABC: Promise<void> = executorABC({ type: 'FOO()' }, () => {}, {}) as Promise<void>;
 
     let thenSpy = chai.spy();
     let catchSpy = chai.spy();
 
-    expect(promise).to.exist;
-    expect((promise as Promise<void>).then).to.be.function;
-    expect((promise as Promise<void>).catch).to.be.function;
+    expect(promiseABC).to.exist;
+    expect(promiseABC.then).to.be.function;
+    expect(promiseABC.catch).to.be.function;
 
-    (promise as Promise<void>).then(thenSpy).catch(catchSpy);
-
-    // check promises combination
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.not.have.been.called;
-
-    promiseAResolve();
-
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.not.have.been.called;
-
-    promiseBResolve();
-
-    expect(thenSpy).to.have.been.called;
-    expect(catchSpy).to.have.been.called;
+    expect(promiseABC).to.be.fulfilled;
+    expect(promiseABC).to.become(undefined);
   });
 
   it('should return executor that rejects on children reject', () => {
-    let promiseAResolve, promiseAReject;
-    let promiseBResolve, promiseBReject;
-
-    function executorA() {
-      return new Promise<void>((resolve, reject) => { promiseAResolve = resolve; promiseAReject = reject; });
+    function executorResolved() {
+      return Promise.resolve();
     }
 
-    function executorB() {
-      return new Promise<void>((resolve, reject) => { promiseBResolve = resolve; promiseBReject = reject; });
+    function executorRejected() {
+      return Promise.reject(new Error());
     }
 
-    const executorAB = combineExecutors(executorA, executorB);
+    function executorVoid() {
+    }
 
-    expect(executorAB).to.be.function;
-    let promise = executorAB({ type: 'FOO()' }, () => {}, {});
+    const executorABC = combineExecutors({
+      a: executorResolved,
+      b: executorRejected,
+      c: executorVoid
+    });
 
-    let thenSpy = chai.spy();
-    let catchSpy = chai.spy();
+    expect(executorABC).to.be.function;
+    let promise: Promise<void> = executorABC({ type: 'FOO()' }, () => {}, {}) as Promise<void>;
 
     expect(promise).to.exist;
-    expect((promise as Promise<void>).then).to.be.function;
-    expect((promise as Promise<void>).catch).to.be.function;
+    expect(promise.then).to.be.function;
+    expect(promise.catch).to.be.function;
 
-    (promise as Promise<void>).then(thenSpy).catch(catchSpy);
-
-    // check promises combination
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.not.have.been.called;
-
-    promiseAReject();
-
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.have.been.called;
+    expect(promise).to.be.rejected;
   });
 
-  it('should throw an exception for call with invalid argument', () => {
-    expect(() => { (combineExecutors as any)({ 'foo': 'bar' }); }).to.throw(Error);
-    expect(() => { (combineExecutors as any)([function() {}, undefined]); }).to.throw(Error);
+  it('should pass sub-state to sub-executors', () => {
+    const state = {
+      a: 'foo',
+      b: 'bar'
+    };
+    const executorA = chai.spy();
+    const executorB = chai.spy();
+    const dispatch = chai.spy();
+
+    const executorAB = combineExecutors({
+      a: executorA,
+      b: executorB
+    });
+
+    executorAB({ type: 'FOO()' }, dispatch, state);
+    expect(executorA).to.have.been.called.with({ type: 'FOO()' }, dispatch, state.a);
+    expect(executorB).to.have.been.called.with({ type: 'FOO()' }, dispatch, state.b);
   });
+  it('should pass sub-state to sub-executors for undefined state', () => {
+    const executorA = chai.spy();
+    const executorB = chai.spy();
+    const dispatch = chai.spy();
+
+    const executorAB = combineExecutors({
+      a: executorA,
+      b: executorB
+    });
+
+    executorAB({ type: 'FOO()' }, dispatch, undefined);
+    expect(executorA).to.have.been.called.with({ type: 'FOO()' }, dispatch, undefined);
+    expect(executorB).to.have.been.called.with({ type: 'FOO()' }, dispatch, undefined);
+  });
+  //
+  // it('should throw an exception for call with invalid argument', () => {
+  //   expect(() => { (reduceExecutors as any)({ 'foo': 'bar' }); }).to.throw(Error);
+  //   expect(() => { (reduceExecutors as any)([function() {}, undefined]); }).to.throw(Error);
+  // });
 });

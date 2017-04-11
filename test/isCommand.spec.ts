@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { isCommand } from '../src/index';
 
-describe('combineExecutors', () => {
+describe('reduceExecutors', () => {
   it('should export isCommand function', () => {
     expect(isCommand).to.be.function;
   });
