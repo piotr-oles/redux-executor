@@ -25,7 +25,6 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
       const store: Store<S> = next(reducer, preloadedState);
 
       // set initial values in this scope
-      let prevState: S | undefined = preloadedState;
       let currentExecutor: Executor<S> = executor;
 
       // executable store adds `replaceExecutor` method to it's interface

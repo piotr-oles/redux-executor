@@ -29,6 +29,23 @@ const store = createStore(
 );
 ```
 
+#### Redux DevTools ####
+To use redux-executor with Redux DevTools, you have to be careful about enhancers order. It's because redux-executor blocks
+commands to next enhancers so it has to be placed after DevTools (to see commands).
+
+```js
+const devToolsCompose = window && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : compose;
+
+const enhancer = compose(
+  devToolsCompose(
+    // ...some enhancers
+    applyMiddleware(/* ...some middlewares */)
+  ),
+  createExecutorEnhancer(rootExecutor)
+);
+```
+
 ## Motivation ##
 There are many clever solutions to deal with side-effects in redux application like [redux-thunk](https://github.com/gaearon/redux-thunk)
 or [redux-saga](https://github.com/redux-saga/redux-saga). The goal of this library is to be simpler than **redux-saga**
@@ -38,7 +55,8 @@ Typical usage of executor is to fetch some external resource, for example list o
 ```js
 import { handleCommand } from 'redux-executor';
 import { postApi } from './api/postApi';
-import { postsRequested, postsResolved, postsRejected } from './actions/postActions';
+// import action creators
+import { postsRequested, postsResolved, postsRejected } from './actions/postActions'; 
 
 // postsExecutor.js
 function fetchPostsExecutor(command, dispatch, state) {
@@ -110,6 +128,86 @@ export default combineExecutors({
   ),
   bar: barExecutor
 });
+```
+
+## Execution order ##
+Sometimes we want to dispatch actions in proper order. To do this, we have to return promise from executors we want
+to include to our execution order. If we dispatch **command**, dispatch method will return action (it's redux behaviour) with
+additional `promise` field that contains promise of our side-effects. Keep in mind that this promise is the result of
+calling all combined or reduced executors (built-in implementations uses `Promise.all`, see [reduceExecutors](#reduceexecutors), 
+[combineExecutors](#combineexecutors)). Because of that you should not rely on promise content - in fact it should 
+be undefined.
+
+Lets say that we want to run `firstCommand` and then `secondCommand` and `thirdCommand` in parallel. 
+The easiest solution is:
+```js
+// import action creators
+import { firstCommand, secondCommand, thirdCommand } from './commands/exampleCommands';
+
+function firstThenNextExecutor(command, dispatch, state) {
+  return dispatch(firstCommand()).promise
+  .then(() => Promise.all([
+    dispatch(secondCommand()).promise, 
+    dispatch(thirdCommand()).promise
+  ]));
+}
+
+export default handleCommand('FIRST_THEN_NEXT()', firstThenNextExecutor);
+```
+
+To be more declarative and to reduce boilerplate code, you can create generic `sequenceCommandExecutor` and 
+`parallelCommandExecutor`.
+
+```js
+// executionFlowExecutors.js
+import { handleCommand } from 'redux-executor';
+
+export const sequenceCommandExecutor = handleCommand(
+  'SEQUENCE()',
+  (command, dispatch) => command.payload.reduce(
+    (promise, command) => promise.then(() => dispatch(command).promise || Promise.resolve()),
+    Promise.resolve()
+  )
+);
+
+export const parallelCommandExecutor = handleCommand(
+  'PARALLEL()',
+  (command, dispatch) => Promise.all(
+    command.payload.map(command => dispatch(command).promise || Promise.resolve())
+  ).then(() => undefined) // we should return Promise<void> because we should not rely on promise result
+);
+```
+
+With this commands we can create action creator instead of executor for `firstCommand`, `secondCommand` and 
+`thirdCommand` example.
+```js
+// import action creators
+import { firstCommand, secondCommand, thirdCommand } from './commands/exampleCommands';
+import { sequenceCommand, parallelCommand } from './commands/executionOrderCommands';
+
+export default function firstThenNext() {
+  return sequenceCommand([
+    firstCommand(),
+    parallelCommand([
+      secondCommand(),
+      thirdCommand()
+    ])
+  ]);
+}
+// it will return
+// {
+//   type: 'SEQUENCE()',
+//   payload: [
+//     { type: 'FIRST()' },
+//     { 
+//       type: 'PARALLEL()',
+//       payload: [
+//         { type: 'SECOND()' },
+//         { type: 'THIRD()' }
+//       ]
+//     }
+//   ]
+// }
 ```
 
 ## API ##
