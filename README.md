@@ -8,7 +8,7 @@ Redux [enhancer](http://redux.js.org/docs/api/createStore.html) for handling sid
 **Warning: API is not stable yet, will be from version 1.0**
 
 ## Table of Contents
-1. [Instalation](#installation)
+1. [Installation](#installation)
 1. [Motivation](#motivation)
 1. [Concepts](#concepts)
 1. [Composition](#composition)
