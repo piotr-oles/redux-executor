@@ -8,13 +8,14 @@ Redux [enhancer](http://redux.js.org/docs/api/createStore.html) for handling sid
 **Warning: API is not stable yet, will be from version 1.0**
 
 ## Table of Contents
-1. [Instalation](#instalation)
+1. [Instalation](#installation)
 1. [Motivation](#motivation)
 1. [Concepts](#concepts)
 1. [Composition](#composition)
 1. [Execution order](#execution-order)
 1. [API](#api)
 1. [Code Splitting](#code-splitting)
+1. [Typings](#typings)
 1. [License](#license)
 
 ## Installation
@@ -24,7 +25,7 @@ npm install --save redux-executor
 ```
 This assumes that you’re using [npm](http://npmjs.com/) package manager with a module bundler like 
 [Webpack](http://webpack.github.io/) or [Browserify](http://browserify.org/) to consume 
-[CommonJS modules](http://webpack.github.io/docs/commonjs.html).
+[UMD modules](https://github.com/umdjs/umd).
 
 To enable Redux Executor, use `createExecutorEnhancer` with `createStore`:
 ```js
