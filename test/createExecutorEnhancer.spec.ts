@@ -6,6 +6,14 @@ import { createExecutorEnhancer, EXECUTOR_INIT } from '../src/index';
 chai.use(spies);
 
 describe('createExecutorEnhancer', () => {
+  let dumbReducer, dumbDispatch, dumbState, dumbGetState, dumbExecutor;
+
+  beforeEach(() => {
+    dumbReducer = (state) => state;
+    dumbState = {};
+    dumbGetState = () => ({});
+    dumbDispatch = dumbExecutor = () => undefined;
+  });
 
   it('should export createExecutorEnhancer function', () => {
     expect(createExecutorEnhancer).to.be.function;
@@ -23,17 +31,11 @@ describe('createExecutorEnhancer', () => {
   });
 
   it('should create enhancer that creates store with ExecutableStore interface', () => {
-    function dumbReducer(state) {
-      return state;
-    }
-    function dumbExecutor() {
-    }
-    const dumbState = {};
     function createStore() {
       return {
-        dispatch: () => {},
+        dispatch: dumbDispatch,
         subscribe: chai.spy(),
-        getState: () => dumbState,
+        getState: dumbGetState,
         replaceReducer: () => {}
       };
     }
@@ -60,20 +62,16 @@ describe('createExecutorEnhancer', () => {
   });
 
   it('should create enhancer that creates store with valid replaceExecutor function', () => {
-    function dumbReducer(state) {
-      return state;
-    }
-    function dumbExecutor() {
-    }
     function nextExecutor() {
       return Promise.resolve();
     }
     const dispatchSpy = chai.spy();
+
     function createStore() {
       return {
         dispatch: dispatchSpy,
         subscribe: chai.spy(),
-        getState: () => ({}),
+        getState: dumbGetState,
         replaceReducer: chai.spy(),
         replaceExecutor: chai.spy()
       };
@@ -88,6 +86,7 @@ describe('createExecutorEnhancer', () => {
     expect(dispatchSpy).to.not.have.been.called;
 
     const commandResult = executableStore.dispatch({ type: 'DETECTOR_COMMAND()' });
+
     expect(dispatchSpy).to.not.have.been.called;
     expect(commandResult).to.exist;
     expect(commandResult.promise).to.exist;
@@ -95,7 +94,11 @@ describe('createExecutorEnhancer', () => {
 
     executableStore.replaceExecutor(nextExecutorSpy);
     expect(dispatchSpy).to.not.have.been.called;
-    expect(nextExecutorSpy).to.have.been.called.with({ type: EXECUTOR_INIT }, executableStore.dispatch, {});
+    expect(nextExecutorSpy).to.have.been.called.with(
+      { type: EXECUTOR_INIT },
+      executableStore.dispatch,
+      executableStore.getState
+    );
 
     const nextCommandResult = executableStore.dispatch({ type: 'NEXT_DETECTOR_COMMAND()' });
     expect(dispatchSpy).to.not.have.been.called;
@@ -103,7 +106,11 @@ describe('createExecutorEnhancer', () => {
     expect(nextCommandResult.promise).to.exist;
     expect(nextCommandResult.promise.then).to.be.function;
 
-    expect(nextExecutorSpy).to.have.been.called.with({ type: 'NEXT_DETECTOR_COMMAND()' }, executableStore.dispatch, {});
+    expect(nextExecutorSpy).to.have.been.called.with(
+      { type: 'NEXT_DETECTOR_COMMAND()' },
+      executableStore.dispatch,
+      executableStore.getState
+    );
     expect(dispatchSpy).to.not.have.been.called;
 
     executableStore.dispatch({ type: 'NON_COMMAND' });

@@ -29,6 +29,7 @@
     "url": "https://github.com/piotr-oles/redux-executor/issues"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.62",
     "@types/mocha": "^2.2.40",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
@@ -56,5 +57,8 @@
   },
   "peerDependencies": {
     "redux": "^3.1.0"
+  },
+  "dependencies": {
+    "lodash.isstring": "^4.0.1"
   }
 }

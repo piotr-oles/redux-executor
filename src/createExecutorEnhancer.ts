@@ -47,7 +47,7 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
           let promise: Promise<void> | void = currentExecutor(
             action as any,
             executableStore.dispatch,
-            executableStore.getState()
+            executableStore.getState
           );
 
           // return command with promise field to allow to synchronize dispatches

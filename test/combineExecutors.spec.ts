@@ -9,22 +9,24 @@ chai.use(spies);
 chai.use(promised);
 
 describe('combineExecutors', () => {
+  let executorResolved, executorRejected, executorVoid;
+  let dumbDispatch, dumbGetState, getUndefinedState;
+
+  beforeEach(() => {
+    executorResolved = () => Promise.resolve();
+    executorRejected = () => Promise.reject(new Error());
+    executorVoid = () => undefined;
+
+    dumbDispatch = () => undefined;
+    dumbGetState = () => ({});
+    getUndefinedState = () => undefined;
+  });
+
   it('should export combineExecutors function', () => {
     expect(combineExecutors).to.be.function;
   });
 
   it('should return valid executor for combination of two executors', () => {
-    function executorResolved() {
-      return Promise.resolve();
-    }
-
-    function executorRejected() {
-      return Promise.reject(new Error());
-    }
-
-    function executorVoid() {
-    }
-
     const executorABC = combineExecutors({
       a: executorResolved,
       b: executorResolved,
@@ -32,10 +34,7 @@ describe('combineExecutors', () => {
     });
 
     expect(executorABC).to.be.function;
-    let promiseABC: Promise<void> = executorABC({ type: 'FOO()' }, () => {}, {}) as Promise<void>;
-
-    let thenSpy = chai.spy();
-    let catchSpy = chai.spy();
+    const promiseABC: Promise<void> = executorABC({ type: 'FOO()' }, dumbDispatch, dumbGetState) as Promise<void>;
 
     expect(promiseABC).to.exist;
     expect(promiseABC.then).to.be.function;
@@ -46,17 +45,6 @@ describe('combineExecutors', () => {
   });
 
   it('should return executor that rejects on children reject', () => {
-    function executorResolved() {
-      return Promise.resolve();
-    }
-
-    function executorRejected() {
-      return Promise.reject(new Error());
-    }
-
-    function executorVoid() {
-    }
-
     const executorABC = combineExecutors({
       a: executorResolved,
       b: executorRejected,
@@ -64,7 +52,7 @@ describe('combineExecutors', () => {
     });
 
     expect(executorABC).to.be.function;
-    let promise: Promise<void> = executorABC({ type: 'FOO()' }, () => {}, {}) as Promise<void>;
+    const promise: Promise<void> = executorABC({ type: 'FOO()' }, dumbDispatch, dumbGetState) as Promise<void>;
 
     expect(promise).to.exist;
     expect(promise.then).to.be.function;
@@ -74,40 +62,38 @@ describe('combineExecutors', () => {
   });
 
   it('should pass sub-state to sub-executors', () => {
-    const state = {
+    const getState = () => ({
       a: 'foo',
       b: 'bar'
+    });
+    const executorA = (command, dispatch, getState) => {
+      expect(getState()).to.be.equals('foo');
     };
-    const executorA = chai.spy();
-    const executorB = chai.spy();
-    const dispatch = chai.spy();
+    const executorB = (command, dispatch, getState) => {
+      expect(getState()).to.be.equals('bar');
+    };
 
     const executorAB = combineExecutors({
       a: executorA,
       b: executorB
     });
 
-    executorAB({ type: 'FOO()' }, dispatch, state);
-    expect(executorA).to.have.been.called.with({ type: 'FOO()' }, dispatch, state.a);
-    expect(executorB).to.have.been.called.with({ type: 'FOO()' }, dispatch, state.b);
+    executorAB({ type: 'FOO()' }, dumbDispatch, getState);
   });
+
   it('should pass sub-state to sub-executors for undefined state', () => {
-    const executorA = chai.spy();
-    const executorB = chai.spy();
-    const dispatch = chai.spy();
+    function executorA(command, dispatch, getState) {
+      expect(getState()).to.be.undefined;
+    }
+    function executorB(command, dispatch, getState) {
+      expect(getState()).to.be.undefined;
+    }
 
     const executorAB = combineExecutors({
       a: executorA,
       b: executorB
     });
 
-    executorAB({ type: 'FOO()' }, dispatch, undefined);
-    expect(executorA).to.have.been.called.with({ type: 'FOO()' }, dispatch, undefined);
-    expect(executorB).to.have.been.called.with({ type: 'FOO()' }, dispatch, undefined);
+    executorAB({ type: 'FOO()' }, dumbDispatch, getUndefinedState);
   });
-  //
-  // it('should throw an exception for call with invalid argument', () => {
-  //   expect(() => { (reduceExecutors as any)({ 'foo': 'bar' }); }).to.throw(Error);
-  //   expect(() => { (reduceExecutors as any)([function() {}, undefined]); }).to.throw(Error);
-  // });
 });

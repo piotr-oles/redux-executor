@@ -1,94 +1,59 @@
 
 import * as chai from 'chai';
 import * as spies from 'chai-spies';
+import * as promised from 'chai-as-promised';
 import { expect } from 'chai';
 import { reduceExecutors } from '../src/index';
 
 chai.use(spies);
+chai.use(promised);
 
 describe('reduceExecutors', () => {
+  let executorResolved, executorRejected, executorVoid;
+  let dumbDispatch, dumbGetState;
+
+  beforeEach(() => {
+    executorResolved = () => Promise.resolve();
+    executorRejected = () => Promise.reject(new Error());
+    executorVoid = () => undefined;
+
+    dumbDispatch = () => undefined;
+    dumbGetState = () => ({})
+  });
+
   it('should export reduceExecutors function', () => {
     expect(reduceExecutors).to.be.function;
   });
 
   it('should return valid executor for reduction of two executors', () => {
-    let promiseAResolve, promiseAReject;
-    let promiseBResolve, promiseBReject;
+    const executor = reduceExecutors(executorResolved, executorVoid);
 
-    function executorA() {
-      return new Promise<void>((resolve, reject) => { promiseAResolve = resolve; promiseAReject = reject; });
-    }
-
-    function executorB() {
-      return new Promise<void>((resolve, reject) => { promiseBResolve = resolve; promiseBReject = reject; });
-    }
-
-    const executorAB = reduceExecutors(executorA, executorB);
-
-    expect(executorAB).to.be.function;
-    let promise = executorAB({ type: 'FOO()' }, () => {}, {});
-
-    let thenSpy = chai.spy();
-    let catchSpy = chai.spy();
+    expect(executor).to.be.function;
+    let promise: Promise<void> = executor({ type: 'FOO()' }, dumbDispatch, dumbGetState) as Promise<void>;
 
     expect(promise).to.exist;
-    expect((promise as Promise<void>).then).to.be.function;
-    expect((promise as Promise<void>).catch).to.be.function;
+    expect(promise.then).to.be.function;
+    expect(promise.catch).to.be.function;
 
-    (promise as Promise<void>).then(thenSpy).catch(catchSpy);
-
-    // check promises combination
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.not.have.been.called;
-
-    promiseAResolve();
-
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.not.have.been.called;
-
-    promiseBResolve();
-
-    expect(thenSpy).to.have.been.called;
-    expect(catchSpy).to.have.been.called;
+    expect(promise).to.be.fulfilled;
+    expect(promise).to.become(undefined);
   });
 
   it('should return executor that rejects on children reject', () => {
-    let promiseAResolve, promiseAReject;
-    let promiseBResolve, promiseBReject;
+    const executor = reduceExecutors(executorResolved, executorRejected, executorVoid);
 
-    function executorA() {
-      return new Promise<void>((resolve, reject) => { promiseAResolve = resolve; promiseAReject = reject; });
-    }
-
-    function executorB() {
-      return new Promise<void>((resolve, reject) => { promiseBResolve = resolve; promiseBReject = reject; });
-    }
-
-    const executorAB = reduceExecutors(executorA, executorB);
-
-    expect(executorAB).to.be.function;
-    let promise = executorAB({ type: 'FOO()' }, () => {}, {});
-
-    let thenSpy = chai.spy();
-    let catchSpy = chai.spy();
+    expect(executor).to.be.function;
+    let promise: Promise<void> = executor({ type: 'FOO()' }, dumbDispatch, dumbGetState) as Promise<void>;
 
     expect(promise).to.exist;
-    expect((promise as Promise<void>).then).to.be.function;
-    expect((promise as Promise<void>).catch).to.be.function;
+    expect(promise.then).to.be.function;
+    expect(promise.catch).to.be.function;
 
-    (promise as Promise<void>).then(thenSpy).catch(catchSpy);
-
-    // check promises combination
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.not.have.been.called;
-
-    promiseAReject();
-
-    expect(thenSpy).to.not.have.been.called;
-    expect(catchSpy).to.have.been.called;
+    expect(promise).to.be.rejected;
   });
 
   it('should throw an exception for call with invalid argument', () => {
+    expect(() => { (reduceExecutors as any)(undefined); }).to.throw(Error);
     expect(() => { (reduceExecutors as any)({ 'foo': 'bar' }); }).to.throw(Error);
     expect(() => { (reduceExecutors as any)([function() {}, undefined]); }).to.throw(Error);
   });

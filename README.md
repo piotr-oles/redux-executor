@@ -12,6 +12,7 @@ Redux [enhancer](http://redux.js.org/docs/api/createStore.html) for handling sid
 1. [Motivation](#motivation)
 1. [Concepts](#concepts)
 1. [Composition](#composition)
+1. [Narrowing](#narrowing)
 1. [Execution order](#execution-order)
 1. [API](#api)
 1. [Code Splitting](#code-splitting)
@@ -70,7 +71,7 @@ import { postApi } from './api/postApi';
 import { postsRequested, postsResolved, postsRejected } from './actions/postActions'; 
 
 // postExecutors.js
-function fetchPostsExecutor(command, dispatch, state) {
+function fetchPostsExecutor(command, dispatch, getState) {
   dispatch(postsRequested());
   
   return postApi.list(command.payload.page)
@@ -96,7 +97,7 @@ All, excluding executors, will be pure.
 ### An Executor
 It may sounds a little bit scary but there is nothing to fear - executor is very pure and simple function.
 ```typescript
-type Executor<S> = (command: ActionLike, dispatch: ExecutableDispatch<S>, state: S | undefined) => Promise<void> | void;
+type Executor<S> = (command: Action, dispatch: ExecutableDispatch<S>, getState: GetState<S | undefined>) => Promise<void> | void;
 ```
 Like you see above, executor takes an action (called **command** in executors), enhanced `dispatch` function and state.
 It can return a `Promise` to provide custom execution flow.
@@ -141,6 +142,55 @@ export default combineExecutors({
 });
 ```
 
+#### Mounting
+To re-use executors we can also mount them to some state branch. To do this, use `mountExecutor` function
+with state selector and executor.
+```js
+import { mountExecutor } from 'redux-executor';
+
+// our state has shape:
+// {
+//   foo: [1, 3],
+// }
+//
+// We want to bind `fooExecutor` to the length of `state.foo` branch
+
+function fooExecutor(command, dispatch, getState) {
+  console.log(getState()); // > 2
+}
+
+export default mountExecutor((state) => state.foo.length, fooExecutor);
+```
+
+## Narrowing
+By default executor runs for every command. To limit executor to given command type, you can write _if_ statement
+or use `handleCommand`/`handleCommands` function.
+
+For example to limit `fooExecutor` to command `FOO()`, `barExecutor` to command `BAR()` and mix them into one executor:
+```js
+import { handleCommand, handleCommands, reduceExecutors } from 'redux-executor';
+
+function fooExecutor(command, dispatch, getState) { 
+  // foo executor logic
+}
+
+function barExecutor(command, dispatch, getState) {
+  // bar executor logic  
+}
+
+// OPTION 1: handleExecutor + reduceExecutors
+export default reduceExecutors(
+  handleCommand('FOO()', fooExecutor),
+  handleCommand('BAR()', barExecutor)
+);
+
+// OPTION 2: handleCommands
+export default handleCommands({
+  'FOO()': fooExecutor,
+  'BAR()': barExecutor
+});
+```
+
 ## Execution order
 Sometimes we want to dispatch actions in proper order. To do this, we have to return promise from executors we want
 to include to our execution order. If we dispatch **command**, dispatch method will return action (it's redux behaviour) with
@@ -155,7 +205,7 @@ The easiest solution is:
 // import action creators
 import { firstCommand, secondCommand, thirdCommand } from './commands/exampleCommands';
 
-function firstThenNextExecutor(command, dispatch, state) {
+function firstThenNextExecutor(command, dispatch, getState) {
   return dispatch(firstCommand()).promise
   .then(() => Promise.all([
     dispatch(secondCommand()).promise, 
@@ -261,9 +311,21 @@ It's type of store that has enhanced dispatch method (see [ExecutableDispatch](#
 
 #### Executor
 ```typescript
-type Executor<S> = (command: ActionLike, dispatch: ExecutableDispatch<S>, state: S | undefined) => Promise<void> | void;
+type Executor<S> = (command: Action, dispatch: ExecutableDispatch<S>, getState: GetState<S | undefined>) => Promise<void> | void;
 ```
 See [Concepts / An Executor](#an-executor)
+
+#### EXECUTOR_INIT
+```typescript
+const EXECUTOR_INIT: string = '@@executor/INIT()';
+```
+Command of this type is dispatched on init and `replaceExecutor` call.
+
+#### GetState
+```typescript
+type GetState<S> = () => S;
+```
+Simple function to get current state (we don't provide state itself because it can change during async side-effects).
 
 #### handleCommand
 ```typescript
@@ -287,6 +349,12 @@ Map is an object where key is a command type, value is an executor (inspired by 
 function isCommand(object: any): boolean;
 ```
 Checks if given object is a command (`object.type` ends with `()` string).
+
+#### isCommandType
+```typescript
+function isCommandType(type: string): boolean;
+```
+Similar to `isCommand` but checks only `type` string.
 
 #### mountExecutor
 ```typescript

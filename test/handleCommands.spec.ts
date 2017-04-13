@@ -12,10 +12,10 @@ describe('handleCommands', () => {
   });
 
   it('should return executor that runs only for given command types', () => {
+    const dumbGetState = () => ({});
     const executorSpyA = chai.spy();
     const executorSpyB = chai.spy();
     const dispatchSpy = chai.spy();
-    const dumbState = {};
 
     const targetedExecutor = handleCommands({
       'COMMAND_TYPE_A()': executorSpyA,
@@ -27,25 +27,25 @@ describe('handleCommands', () => {
     expect(executorSpyB).to.not.have.been.called;
 
     // expect that executor will bypass this command
-    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE()' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE()' }, dispatchSpy, dumbGetState);
     expect(executorSpyA).to.not.have.been.called;
     expect(executorSpyB).to.not.have.been.called;
     expect(dispatchSpy).to.not.have.been.called;
 
     // expect that executor will bypass similar non command
-    targetedExecutor({ type: 'COMMAND_TYPE_A' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'COMMAND_TYPE_A' }, dispatchSpy, dumbGetState);
     expect(executorSpyA).to.not.have.been.called;
     expect(executorSpyB).to.not.have.been.called;
     expect(dispatchSpy).to.not.have.been.called;
 
     // expect that executor will call wrapped executor A
-    targetedExecutor({ type: 'COMMAND_TYPE_A()' }, dispatchSpy, dumbState);
-    expect(executorSpyA).to.have.been.called.with({ type: 'COMMAND_TYPE_A()' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'COMMAND_TYPE_A()' }, dispatchSpy, dumbGetState);
+    expect(executorSpyA).to.have.been.called.with({ type: 'COMMAND_TYPE_A()' }, dispatchSpy, dumbGetState);
     expect(executorSpyB).to.not.have.been.called;
     expect(dispatchSpy).to.have.been.called;
 
     // expect that executor will call wrapped executor B
-    targetedExecutor({ type: 'COMMAND_TYPE_B()' }, dispatchSpy, dumbState);
-    expect(executorSpyB).to.have.been.called.with({ type: 'COMMAND_TYPE_B()' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'COMMAND_TYPE_B()' }, dispatchSpy, dumbGetState);
+    expect(executorSpyB).to.have.been.called.with({ type: 'COMMAND_TYPE_B()' }, dispatchSpy, dumbGetState);
   });
 });

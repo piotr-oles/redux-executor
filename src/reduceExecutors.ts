@@ -1,6 +1,7 @@
 import { ActionLike } from './ActionLike';
 import { Executor } from './Executor';
 import { ExecutableDispatch } from './ExecutableDispatch';
+import { GetState } from './GetState';
 
 /**
  * Reduce executors to get one that will call wrapped.
@@ -22,10 +23,14 @@ export function reduceExecutors<S>(...executors: Executor<S>[]): Executor<S> {
     );
   }
 
-  return function reducedExecutor(command: ActionLike, dispatch: ExecutableDispatch<S>, state: S): Promise<void> {
+  return function reducedExecutor(
+    command: ActionLike,
+    dispatch: ExecutableDispatch<S>,
+    getState: GetState<S | undefined>
+  ): Promise<void> {
     return Promise.all(
       executors
-        .map(executor => executor(command, dispatch, state))
+        .map(executor => executor(command, dispatch, getState))
         .filter(promise => !!promise)
     ) as Promise<any>;
   };

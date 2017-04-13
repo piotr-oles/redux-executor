@@ -13,20 +13,21 @@ describe('mountExecutor', () => {
   });
 
   it('should mount executor using selector', () => {
-    const state = {
+    const getState = () => ({
       branchA: {
         subBranchB: {
           value: 1
         }
       }
-    };
-    function dumbDispatch(action) {
-    }
-    function executor(command, dispatch, state) {
-      if (state && state.value === 1 && command && command.type === 'COMMAND_THROUGH_MOUNT()') {
+    });
+    const dumbDispatch = () => {};
+
+    function executor(command, dispatch, getState) {
+      if (getState() && getState().value === 1 && command && command.type === 'COMMAND_THROUGH_MOUNT()') {
         dispatch({type: 'SELECTORS_WORKED'});
       }
     }
+
     function selector(state) {
       return state.branchA.subBranchB;
     }
@@ -39,7 +40,7 @@ describe('mountExecutor', () => {
     mountedExecutor(
       { type: 'COMMAND_THROUGH_MOUNT()' },
       dumbDispatchSpy,
-      state
+      getState
     );
 
     expect(dumbDispatchSpy).to.have.been.called.once.with({type: 'SELECTORS_WORKED'});

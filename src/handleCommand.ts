@@ -2,6 +2,8 @@
 import { ActionLike } from './ActionLike';
 import { Executor } from './Executor';
 import { ExecutableDispatch } from './ExecutableDispatch';
+import { GetState } from './GetState';
+import { isCommandType } from './isCommandType';
 
 /**
  * Wraps executor to handle only one type of command.
@@ -11,7 +13,7 @@ import { ExecutableDispatch } from './ExecutableDispatch';
  * @returns Executor that runs wrapped executor only for commands with given type.
  */
 export function handleCommand<S>(type: string, executor: Executor<S>): Executor<S> {
-  if (!type || type.length < 3 || ')' !== type[type.length - 1] || '(' !== type[type.length - 2]) {
+  if (!isCommandType(type)) {
     throw new Error(`Expected type to be valid command type with '()' ending. Given '${type}' type. Maybe typo?`);
   }
 
@@ -19,9 +21,9 @@ export function handleCommand<S>(type: string, executor: Executor<S>): Executor<
     throw new Error('Expected the executor to be a function.');
   }
 
-  return function wideExecutor(command: ActionLike, dispatch: ExecutableDispatch<S>, state: S): Promise<void> | void {
+  return function wideExecutor(command: ActionLike, dispatch: ExecutableDispatch<S>, getState: GetState<S>): Promise<void> | void {
     if (command && command.type === type) {
-      return executor(command, dispatch, state);
+      return executor(command, dispatch, getState);
     }
   };
 }

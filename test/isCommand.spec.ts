@@ -2,7 +2,7 @@
 import { expect } from 'chai';
 import { isCommand } from '../src/index';
 
-describe('reduceExecutors', () => {
+describe('isCommand', () => {
   it('should export isCommand function', () => {
     expect(isCommand).to.be.function;
   });
@@ -21,6 +21,7 @@ describe('reduceExecutors', () => {
     expect(isCommand({ type: 'SOME_TYPE)' })).to.be.false;
     expect(isCommand({ type: 'SOME_TYPE(' })).to.be.false;
     expect(isCommand({ type: 'SOME_TYP(E)' })).to.be.false;
+    expect(isCommand({ type: 'SOME_TYPE()'.split('') as any })).to.be.false;
 
     expect(isCommand({ type: 'SOME_TYPE()' })).to.be.true;
   });
