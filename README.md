@@ -239,7 +239,7 @@ export const parallelCommandExecutor = handleCommand(
 );
 ```
 
-With this executors we can create action creator instead of executor for the previous example.
+With these executors we can create action creator instead of executor for the previous example.
 ```js
 // import action creators
 import { firstCommand, secondCommand, thirdCommand } from './commands/exampleCommands';
