@@ -25,7 +25,6 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
       const store: Store<S> = next(reducer, preloadedState);
 
       // set initial values in this scope
-      let prevState: S | undefined = preloadedState;
       let currentExecutor: Executor<S> = executor;
 
       // executable store adds `replaceExecutor` method to it's interface
@@ -48,7 +47,7 @@ export function createExecutorEnhancer<S>(executor: Executor<S>): StoreExecutabl
           let promise: Promise<void> | void = currentExecutor(
             action as any,
             executableStore.dispatch,
-            executableStore.getState()
+            executableStore.getState
           );
 
           // return command with promise field to allow to synchronize dispatches

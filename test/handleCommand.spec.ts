@@ -6,15 +6,15 @@ import { handleCommand } from '../src/index';
 
 chai.use(spies);
 
-describe('combineExecutors', () => {
+describe('handleCommand', () => {
   it('should export handleCommand function', () => {
     expect(handleCommand).to.be.function;
   });
 
   it('should return executor that runs only for given command type', () => {
+    const dumbGetState = () => ({});
     const executorSpy = chai.spy();
     const dispatchSpy = chai.spy();
-    const dumbState = {};
 
     const targetedExecutor = handleCommand('COMMAND_TYPE()', executorSpy);
 
@@ -22,18 +22,18 @@ describe('combineExecutors', () => {
     expect(executorSpy).to.not.have.been.called;
 
     // expect that executor will bypass this command
-    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE()' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'ANOTHER_COMMAND_TYPE()' }, dispatchSpy, dumbGetState);
     expect(executorSpy).to.not.have.been.called;
     expect(dispatchSpy).to.not.have.been.called;
 
     // expect that executor will bypass similar non command
-    targetedExecutor({ type: 'COMMAND_TYPE' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'COMMAND_TYPE' }, dispatchSpy, dumbGetState);
     expect(executorSpy).to.not.have.been.called;
     expect(dispatchSpy).to.not.have.been.called;
 
     // expect that executor will call wrapped executor
-    targetedExecutor({ type: 'COMMAND_TYPE()' }, dispatchSpy, dumbState);
-    expect(executorSpy).to.have.been.called.with({ type: 'COMMAND_TYPE()' }, dispatchSpy, dumbState);
+    targetedExecutor({ type: 'COMMAND_TYPE()' }, dispatchSpy, dumbGetState);
+    expect(executorSpy).to.have.been.called.with({ type: 'COMMAND_TYPE()' }, dispatchSpy, dumbGetState);
     expect(dispatchSpy).to.have.been.called;
   });
 
